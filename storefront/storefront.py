@@ -1,0 +1,2 @@
+class StoreFront:
+    pass

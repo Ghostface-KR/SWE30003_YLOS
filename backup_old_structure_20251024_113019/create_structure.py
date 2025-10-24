@@ -1,6 +1,6 @@
 from pathlib import Path
 
-base = Path("SWE30003_YLOS")
+base = Path("YLOS_system")
 
 folders = [
     base / "accounts",
@@ -28,4 +28,4 @@ for folder in folders:
 for f in files:
     Path(f).touch(exist_ok=True)
 
-print("✅ SWE30003_YLOS folder structure created successfully.")
+print("✅ YLOS_system folder structure created successfully.")
