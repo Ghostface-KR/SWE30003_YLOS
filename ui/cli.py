@@ -1,6 +1,5 @@
 from classes.catalogue import Product
 from classes.catalogue import Catalogue
-# from classes.catalogue import get_available_categories
 
 def show_products(products):
     for p in products:
