@@ -1,4 +1,4 @@
-from classes.catalogue import Product
+ from classes.catalogue import Product
 from classes.catalogue import Catalogue
 
 def show_products(products):
