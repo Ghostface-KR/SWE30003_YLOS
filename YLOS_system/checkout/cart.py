@@ -1,15 +1,11 @@
-from dataclasses import dataclass
 from decimal import Decimal
-from typing import Dict, List, Optional
+from typing import Dict, List, Protocol, Optional, Callable, Any
+import datetime
+from .cart_item import CartItem  # uncomment when file available
 
-# NOTE: Expect a CartItem value object elsewhere in your codebase:
-# @dataclass(frozen=True)
-# class CartItem:
-#     product_id: str
-#     name: str
-#     unit_price: Decimal
-#     qty: int
-#     def subtotal(self) -> Decimal: return self.unit_price * qty
+class CataloguePort(Protocol):
+    def get_product(self, product_id: str) -> dict:
+        ...
 
 class Cart:
     """
@@ -18,20 +14,32 @@ class Cart:
     After that, prices come from the CartItems (snapshots).
     """
 
-    def __init__(self, catalogue: object) -> None:
-        self._catalogue = catalogue  # TODO: provide get_product(product_id)-> {name, price, stock}
-        self._items: Dict[str, "CartItem"] = {}
+    def __init__(self, catalogue: CataloguePort, logger: Optional[Callable[[str, dict], None]] = None) -> None:
+        self._catalogue = catalogue     # internal reference to a port (get_product)
+        self._logger = logger
+        self._items: Dict[str, "CartItem"] = {}  # internal storage: product_id -> CartItem
+
+    def _log(self, action: str, **fields) -> None:
+        if not hasattr(self, "_logger") or self._logger is None:
+            return
+        payload = {"timestamp": datetime.datetime.now().isoformat(), "action": action}
+        payload.update(fields)
+        try:
+            self._logger(action, payload)
+        except Exception:
+            # Swallow logger errors to avoid breaking domain logic
+            pass
 
     # ----- Queries -----
     def items(self) -> List["CartItem"]:
-        """Return a list of current CartItems (read-only)."""
-        # TODO: return a copy to avoid external mutation
+        """Return a list of current CartItems (read-only copy)."""
         return list(self._items.values())
+
 
     def subtotal(self) -> Decimal:
         """Sum of line subtotals (no shipping or tax)."""
-        # TODO: sum(item.subtotal() for item in self._items.values())
-        raise NotImplementedError
+        return sum((item.subtotal() for item in self._items.values()), Decimal("0.00"))
+
 
     def is_empty(self) -> bool:
         """True if the cart has no items."""
@@ -42,44 +50,144 @@ class Cart:
         """
         Add a product (creates/updates a CartItem snapshot with current name & price).
         """
-        # TODO: guard: qty >= 1
-        # TODO: fetch = self._catalogue.get_product(product_id)
-        #       validate product exists
-        #       validate stock >= (existing_qty + qty)
-        # TODO: snapshot name and unit_price = Decimal(str(fetch["price"]))
-        # TODO: if exists: new_qty = old.qty + qty (validate >=1)
-        #       update CartItem with new_qty (immutably)
-        # TODO: else: create CartItem(product_id, name, unit_price, qty)
-        raise NotImplementedError
+        # Validates qty is int & >= 1
+        if isinstance(qty, bool):
+            raise ValueError("qty must be an integer, not a boolean")
+        if not isinstance(qty, int):
+            raise ValueError("qty must be an integer")
+        if qty < 1:
+            raise ValueError("qty must be ≥ 1")
+
+        # Lookup product via catalogue, validate not empty
+        fetch = self._catalogue.get_product(product_id)
+        if fetch is None:
+            raise ValueError("product not found in catalogue")
+
+        # Extract fields from the catalogue record (read-only) w/ validation
+        if "name" not in fetch:
+            raise KeyError("product 'name' missing")
+        name = fetch["name"]
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError("invalid product name")
+
+        if "price" not in fetch:
+            raise KeyError("product 'price' missing")
+        price = fetch["price"]
+        if not isinstance(price, (int, float, Decimal)):
+            raise TypeError("product price must be a number")
+        if price < 0:
+            raise ValueError("product price cannot be negative")
+
+        if "stock" not in fetch:
+            raise KeyError("product 'stock' missing")
+        stock = fetch["stock"]
+        if not isinstance(stock, int) or stock < 0:
+            raise ValueError("invalid product stock")
+
+
+        # Determine the intended new quantity and ensure available stock is sufficient
+        if product_id in self._items:
+            existing_qty = self._items[product_id].qty
+        else:
+            existing_qty = 0
+
+        intended_qty = existing_qty + qty
+
+        if intended_qty > stock:
+            raise ValueError(f"only {stock} left in stock")
+
+        # Choose correct unit price snapshot (keep existing price if already in cart)
+        if product_id in self._items:
+            unit_price_snapshot = self._items[product_id].unit_price
+        else:
+            unit_price_snapshot = Decimal(str(price))
+
+        # Build updated CartItem (immutable)
+        if product_id in self._items:
+            old_item = self._items[product_id]
+            new_item = old_item.with_qty(intended_qty)
+        else:
+            new_item = CartItem(product_id, name, unit_price_snapshot, intended_qty)
+
+        # Save new/updated line to cart
+        self._items[product_id] = new_item
+
+        # Handle potential name mismatches between the catalogue and existing cart item
+        if product_id in self._items:
+            current_item = self._items[product_id]
+            if current_item.name != name:
+                # Keep the original name for consistency, but record the mismatch for reference
+                self._log("name_mismatch", product_id=product_id, old_name=current_item.name, new_name=name)
+
+        # Log cart changes for traceability and analytics
+        self._log("add/update", product_id=product_id, qty=qty, new_total_qty=intended_qty)
 
     def update_qty(self, product_id: str, qty: int) -> None:
         """
         Set a new quantity for an item; remove if qty == 0.
         """
-        # TODO: if product not in cart -> no-op or raise
-        # TODO: if qty == 0: remove and return
-        # TODO: guard: qty >= 1
-        # TODO: check stock in catalogue >= qty
-        # TODO: rebuild CartItem with same snapshot name/unit_price, new qty
-        raise NotImplementedError
+        # Check if product is in cart.
+        if product_id not in self._items:
+            raise ValueError("product not found in cart")
+
+        # Removes product if qty is 0
+        if qty == 0:
+            self.remove(product_id)
+            return
+
+        # Validates that the requested quantity is an integer and at least 1.
+        if isinstance(qty, bool):
+            raise ValueError("qty must be an integer, not a boolean")
+        if not isinstance(qty, int):
+            raise ValueError("qty must be an integer")
+        if qty < 1:
+            raise ValueError("qty must be ≥ 1")
+
+        # Early return: no change needed if requested qty equals current qty
+        existing_qty = self._items[product_id].qty
+        if qty == existing_qty:
+            return
+
+        # Determine if this update increases the required stock; only then consult the catalogue
+        if qty > existing_qty:
+            # Lookup product via catalogue, validate not empty
+            fetch = self._catalogue.get_product(product_id)
+            if fetch is None:
+                raise ValueError("product not found in catalogue")
+
+            # Read and validate stock only (name/price not needed for qty updates)
+            if "stock" not in fetch:
+                raise KeyError("product 'stock' missing")
+            stock = fetch["stock"]
+            if not isinstance(stock, int) or stock < 0:
+                raise ValueError("invalid product stock")
+
+            # Compare requested quantity to available stock
+            if qty > stock:
+                raise ValueError(f"only {stock} left in stock")
+        else:
+            # qty <= existing; no stock increase needed; no catalogue call required
+            pass
+
+        # Replace the existing cart line immutably with the updated quantity (keep price snapshot)
+        old_item = self._items[product_id]
+        new_item = old_item.with_qty(qty)
+        self._items[product_id] = new_item
+
+        # Optional: log this quantity change for traceability (simple stdout log)
+        self._log("update_qty", product_id=product_id, old_qty=existing_qty, new_qty=qty)
 
     def remove(self, product_id: str) -> None:
         """Remove an item entirely."""
-        # TODO: pop from dict if present
-        raise NotImplementedError
+
+        if product_id not in self._items:
+            raise ValueError("product not found in cart")
+
+        del self._items[product_id]
+
+        # Log removal for traceability
+        self._log("remove", product_id=product_id)
 
     def clear(self) -> None:
         """Empty the cart after a successful order."""
         self._items.clear()
-
-    # ----- Convenience for demo/UI (optional) -----
-    def view_summary(self) -> dict:
-        """
-        Lightweight read-model for CLI/UI (lines + subtotal).
-        """
-        # TODO: return {
-        #   "lines": [{"id": i.product_id, "name": i.name, "qty": i.qty, "unit_price": str(i.unit_price),
-        #              "subtotal": str(i.subtotal())} for i in self.items()],
-        #   "subtotal": str(self.subtotal())
-        # }
-        raise NotImplementedError

@@ -1,0 +1,22 @@
+# Runtime: current design uses only Python standard library (no installs needed)
+
+# --- Dev / Testing ---
+pytest>=7.4
+
+# --- Optional integrations (uncomment only if you actually use them) ---
+
+# HTTP calls (e.g., future payment/courier gateways)
+# requests>=2.32
+
+# Config via .env
+# python-dotenv>=1.0
+
+# Input validation / typed models (if you want stricter checks)
+# pydantic>=2.7
+
+# Persistence with an ORM (sqlite3 is in stdlib; use this only if you add an ORM)
+# SQLAlchemy>=2.0
+
+# Nicer CLI output (for demos)
+# rich>=13.7
+# typer>=0.12
