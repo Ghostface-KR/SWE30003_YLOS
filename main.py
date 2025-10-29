@@ -366,6 +366,9 @@ def customer_mode(storefront: StoreFront) -> None:
     pass
 
 
+# ========== Kale's Sections Below ==========
+
+
 # ========== ADMIN OPERATIONS ==========
 
 def admin_view_products(catalogue: Catalogue) -> None:
