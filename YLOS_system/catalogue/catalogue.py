@@ -95,6 +95,28 @@ class Catalogue:
         """
         pass
 
+    def add_type(self, type_id: str, name: str, description: Optional[str] = None) -> None:
+        """
+        Register a product type/category in the catalogue.
+
+        Args:
+            type_id: Canonical identifier (e.g., "dairy").
+            name: Human‑readable name (e.g., "Dairy").
+            description: Optional longer description for menus/help.
+
+        Raises:
+            ValueError: If validation fails (e.g., empty fields or duplicate type_id).
+
+        TODO:
+        - Ensure an internal type registry exists (e.g., self._types: Dict[str, Dict[str, str]])
+          and is initialized in __init__ if not already.
+        - Validate inputs: non‑empty strings for type_id and name; consider length/character rules.
+        - Enforce uniqueness of type_id (consider case‑insensitive comparison).
+        - Store in registry, e.g.: self._types[type_id] = {"name": name, "description": description or ""}.
+        - Consider exposing helper methods later (has_type, get_all_types) for validation/UI lists.
+        """
+        pass
+
     # Admin operations (used in Scenario 1 and 4)
     
     def add_product(self, product_id: str, name: str, price: float, stock: int, type_id: str) -> None:

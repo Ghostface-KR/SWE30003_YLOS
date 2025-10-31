@@ -1,9 +1,6 @@
 from decimal import Decimal
-from typing import Tuple, Optional, Protocol
-
-class PaymentGatewayPort(Protocol):
-    def charge(self, order_id: str, amount: Decimal) -> Tuple[bool, str]:
-        ...
+from typing import Tuple, Optional
+from protocols import PaymentGatewayPort
 
 class PaymentService:
     """

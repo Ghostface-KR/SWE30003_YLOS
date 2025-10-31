@@ -1,11 +1,6 @@
 from decimal import Decimal
-from typing import Dict, List, Protocol, Optional, Callable, Any
+from typing import Dict, List, Optional, Callable, Any
 import datetime
-from .cart_item import CartItem  # uncomment when file available
-
-class CataloguePort(Protocol):
-    def get_product(self, product_id: str) -> dict:
-        ...
 
 class Cart:
     """
@@ -112,12 +107,6 @@ class Cart:
         # Save new/updated line to cart
         self._items[product_id] = new_item
 
-        # Handle potential name mismatches between the catalogue and existing cart item
-        if product_id in self._items:
-            current_item = self._items[product_id]
-            if current_item.name != name:
-                # Keep the original name for consistency, but record the mismatch for reference
-                self._log("name_mismatch", product_id=product_id, old_name=current_item.name, new_name=name)
 
         # Log cart changes for traceability and analytics
         self._log("add/update", product_id=product_id, qty=qty, new_total_qty=intended_qty)
