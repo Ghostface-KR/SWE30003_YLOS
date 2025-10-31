@@ -3,8 +3,8 @@ import datetime
 from decimal import Decimal
 from typing import Tuple, Optional, Callable, Any
 
-from ..orders.order_item import OrderItem
-from ..orders.order import Order
+from order_item import OrderItem
+from order import Order
 
 
 from .cart import Cart           # uncomment when wiring
@@ -24,14 +24,10 @@ class CheckoutService:
         cart: "Cart",
         shipping_policy: "ShippingPolicy",
         payment_service: "PaymentService",
-        order_factory: Optional[Any] = None,
-        logger: Optional[Callable[[str, dict], None]] = None,
     ) -> None:
         self._cart = cart
         self._shipping_policy = shipping_policy
         self._payment_service = payment_service
-        self._order_factory = order_factory
-        self._logger = logger
 
 
     def _log(self, action: str, **fields) -> None:
@@ -58,7 +54,7 @@ class CheckoutService:
         # Validate address; raise error if invalid.
         addr_errors = address.validate()
         if addr_errors:
-            raise ValueError("Invalid address")
+            raise ValueError(f"Invalid address: {addr_errors}")
 
         # Get subtotal from all cart items.
         subtotal = self._cart.subtotal()

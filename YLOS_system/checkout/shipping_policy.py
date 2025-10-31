@@ -1,10 +1,6 @@
 from decimal import Decimal
-from typing import Protocol, Optional
-
-# TODO: Move CartProtocol to a shared protocols.py to avoid circular dependencies
-class CartProtocol(Protocol):
-    def subtotal(self) -> Decimal:
-        ...
+from typing import Optional
+from protocols import CartPort
 
 class ShippingPolicy:
     """
@@ -30,7 +26,7 @@ class ShippingPolicy:
         self._free_over = free_over
 
     # ----- Behavior -----
-    def cost_for(self, cart: CartProtocol, address: object) -> Decimal:
+    def cost_for(self, cart: CartPort, address: object) -> Decimal:
         """
         Return the shipping cost for the given cart + address.
         """
