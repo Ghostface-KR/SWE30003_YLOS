@@ -32,338 +32,373 @@ import os
 
 
 def clear_screen() -> None:
-    """
-    Clear the console screen for better UX.
-
-    TODO:
-    - Detect operating system (os.name)
-    - Use 'cls' for Windows, 'clear' for Unix/Mac
-    - Call os.system() with appropriate command
-    - Handle any errors silently
-    """
-    pass
+    """Clear the console screen for better UX."""
+    try:
+        if os.name == 'nt':  # Windows
+            os.system('cls')
+        else:  # Unix/Mac
+            os.system('clear')
+    except:
+        pass  # Silently handle any errors
 
 
 def display_banner() -> None:
-    """
-    Display welcome banner/logo for the application.
-
-    TODO:
-    - Print ASCII art or simple text banner
-    - Include store name "Your Local Shop"
-    - Keep it simple (3-5 lines max)
-    """
-    pass
+    """Display welcome banner/logo for the application."""
+    print("\n" + "="*50)
+    print("    YOUR LOCAL SHOP - Online Store")
+    print("    Quality Products at Your Fingertips")
+    print("="*50 + "\n")
 
 
 def display_main_menu() -> None:
-    """
-    Display main menu options.
-
-    TODO:
-    - Print menu title
-    - Print numbered options:
-      1. Customer Mode (Browse/Shop/Checkout)
-      2. Admin Mode (Manage Products)
-      3. Exit
-    - Keep formatting clean and readable
-    """
-    pass
+    """Display main menu options."""
+    print("\n===== MAIN MENU =====")
+    print("1. Customer Mode (Browse/Shop/Checkout)")
+    print("2. Admin Mode (Manage Products)")
+    print("3. Exit")
+    print("="*21)
 
 
 def display_customer_menu() -> None:
-    """
-    Display customer mode menu options.
-
-    TODO:
-    - Print menu title "Customer Menu"
-    - Print numbered options:
-      1. Browse All Products
-      2. Search Products
-      3. Filter by Category
-      4. View Cart
-      5. Add to Cart
-      6. Update Cart Quantity
-      7. Remove from Cart
-      8. Checkout
-      9. Back to Main Menu
-    - Keep formatting clean
-    """
-    pass
+    """Display customer mode menu options."""
+    print("\n===== CUSTOMER MENU =====")
+    print("1. Browse All Products")
+    print("2. Search Products")
+    print("3. Filter by Category")
+    print("4. View Cart")
+    print("5. Add to Cart")
+    print("6. Update Cart Quantity")
+    print("7. Remove from Cart")
+    print("8. Checkout")
+    print("9. Back to Main Menu")
+    print("="*25)
 
 
 def display_admin_menu() -> None:
-    """
-    Display admin mode menu options.
-
-    TODO:
-    - Print menu title "Admin Menu"
-    - Print numbered options:
-      1. View All Products
-      2. Add Product
-      3. Update Product
-      4. Delete Product
-      5. Back to Main Menu
-    - Keep formatting clean
-    """
-    pass
+    """Display admin mode menu options."""
+    print("\n===== ADMIN MENU =====")
+    print("1. View All Products")
+    print("2. Add Product")
+    print("3. Update Product")
+    print("4. Delete Product")
+    print("5. Back to Main Menu")
+    print("="*22)
 
 
 def get_user_choice(prompt: str = "Enter choice: ") -> str:
-    """
-    Get validated user input.
-
-    Args:
-        prompt: The prompt message to display
-
-    Returns:
-        User's input as string (stripped of whitespace)
-
-    TODO:
-    - Display the prompt
-    - Get input from user
-    - Strip whitespace
-    - Return the cleaned input
-    - Handle KeyboardInterrupt (Ctrl+C) gracefully
-    """
-    pass
+    """Get validated user input."""
+    try:
+        user_input = input(prompt)
+        return user_input.strip()
+    except KeyboardInterrupt:
+        print("\n\nOperation cancelled by user.")
+        return ""
 
 
 def display_products(products: list, title: str = "Products") -> None:
-    """
-    Display a list of products in formatted table.
-
-    Args:
-        products: List of product dictionaries
-        title: Header title for the list
-
-    TODO:
-    - Print title with separator line
-    - Check if products list is empty; print "No products found" if so
-    - Print table header: "ID | Name | Price | Stock | Category"
-    - Print separator line
-    - Iterate through products and print each in format:
-      "{id} | {name} | ${price} | {stock} units | {type_id}"
-    - Print closing separator line
-    - Handle missing fields gracefully (use "N/A" for missing data)
-    """
-    pass
+    """Display a list of products in formatted table."""
+    print(f"\n===== {title} =====")
+    print("-" * 70)
+    
+    if not products:
+        print("No products found.")
+        print("-" * 70)
+        return
+    
+    print(f"{'ID':<5} | {'Name':<25} | {'Price':<10} | {'Stock':<10} | {'Category':<10}")
+    print("-" * 70)
+    
+    for product in products:
+        product_id = product.get('id', 'N/A')
+        name = product.get('name', 'N/A')
+        price = product.get('price', 0)
+        stock = product.get('stock', 0)
+        type_id = product.get('type_id', 'N/A')
+        
+        print(f"{product_id:<5} | {name:<25} | ${price:<9.2f} | {stock:<10} units | {type_id:<10}")
+    
+    print("-" * 70)
 
 
 def display_cart_items(items: list, subtotal: Decimal) -> None:
-    """
-    Display cart contents with subtotal.
-
-    Args:
-        items: List of cart item dictionaries
-        subtotal: Cart subtotal amount
-
-    TODO:
-    - Print title "Shopping Cart"
-    - Check if cart is empty; print "Cart is empty" if so
-    - Print table header: "Product | Price | Qty | Subtotal"
-    - Print separator line
-    - Iterate through items and print each in format:
-      "{name} | ${unit_price} | {qty} | ${line_subtotal}"
-    - Print separator line
-    - Print subtotal: "Subtotal: ${subtotal}"
-    - Format all prices to 2 decimal places
-    """
-    pass
+    """Display cart contents with subtotal."""
+    print("\n===== Shopping Cart =====")
+    print("-" * 70)
+    
+    if not items:
+        print("Cart is empty.")
+        print("-" * 70)
+        return
+    
+    print(f"{'Product':<30} | {'Price':<10} | {'Qty':<5} | {'Subtotal':<10}")
+    print("-" * 70)
+    
+    for item in items:
+        name = item.get('name', 'N/A')
+        unit_price = item.get('unit_price', Decimal('0'))
+        qty = item.get('qty', 0)
+        line_subtotal = item.get('line_subtotal', Decimal('0'))
+        
+        print(f"{name:<30} | ${unit_price:<9.2f} | {qty:<5} | ${line_subtotal:<9.2f}")
+    
+    print("-" * 70)
+    print(f"{'Subtotal:':<49} ${subtotal:.2f}")
+    print("-" * 70)
 
 
 def pause() -> None:
-    """
-    Pause execution until user presses Enter.
-
-    TODO:
-    - Print "Press Enter to continue..."
-    - Wait for user to press Enter
-    - This gives user time to read output before screen clears
-    """
-    pass
+    """Pause execution until user presses Enter."""
+    input("\nPress Enter to continue...")
 
 
 # ========== CUSTOMER OPERATIONS ==========
 
 def customer_browse_all(storefront: StoreFront) -> None:
-    """
-    Handle browsing all products (Scenario 2, Step 1).
-
-    Args:
-        storefront: StoreFront instance
-
-    TODO:
-    - Call storefront.browse_products()
-    - Display returned products using display_products()
-    - Handle empty catalogue case
-    - Pause for user to read
-    """
-    pass
+    """Handle browsing all products (Scenario 2, Step 1)."""
+    products = storefront.browse_products()
+    display_products(products, "All Products")
+    pause()
 
 
 def customer_search(storefront: StoreFront) -> None:
-    """
-    Handle product search (Scenario 2, Step 2).
-
-    Args:
-        storefront: StoreFront instance
-
-    TODO:
-    - Prompt user for search keyword
-    - Validate input is not empty
-    - Call storefront.search_products(query)
-    - Display results using display_products()
-    - Show message if no results found
-    - Pause for user to read
-    """
-    pass
+    """Handle product search (Scenario 2, Step 2)."""
+    query = get_user_choice("Enter search keyword: ")
+    
+    if not query:
+        print("Search keyword cannot be empty.")
+        pause()
+        return
+    
+    products = storefront.search_products(query)
+    
+    if not products:
+        print(f"No products found matching '{query}'.")
+    else:
+        display_products(products, f"Search Results for '{query}'")
+    
+    pause()
 
 
 def customer_filter_by_category(storefront: StoreFront) -> None:
-    """
-    Handle filtering by category (Scenario 2, Step 3).
-
-    Args:
-        storefront: StoreFront instance
-
-    TODO:
-    - Display available categories (get from catalogue)
-    - Prompt user to enter category name
-    - Call storefront.filter_products_by_category(type_id)
-    - Display results using display_products()
-    - Show message if no results found
-    - Pause for user to read
-    """
-    pass
+    """Handle filtering by category (Scenario 2, Step 3)."""
+    print("\nAvailable Categories:")
+    print("- Electronics")
+    print("- Clothing")
+    print("- Books")
+    print("- Home")
+    
+    category = get_user_choice("\nEnter category name: ")
+    
+    if not category:
+        print("Category name cannot be empty.")
+        pause()
+        return
+    
+    products = storefront.filter_products_by_category(category)
+    
+    if not products:
+        print(f"No products found in category '{category}'.")
+    else:
+        display_products(products, f"Products in '{category}' Category")
+    
+    pause()
 
 
 def customer_view_cart(storefront: StoreFront) -> None:
-    """
-    Handle viewing cart contents (Scenario 2, Step 5).
-
-    Args:
-        storefront: StoreFront instance
-
-    TODO:
-    - Call storefront.view_cart()
-    - Unpack returned tuple (items, subtotal)
-    - Display using display_cart_items()
-    - Pause for user to read
-    """
-    pass
+    """Handle viewing cart contents (Scenario 2, Step 5)."""
+    items, subtotal = storefront.view_cart()
+    display_cart_items(items, subtotal)
+    pause()
 
 
 def customer_add_to_cart(storefront: StoreFront) -> None:
-    """
-    Handle adding product to cart (Scenario 2, Step 4).
-
-    Args:
-        storefront: StoreFront instance
-
-    TODO:
-    - Prompt user for product ID
-    - Prompt user for quantity (default 1)
-    - Validate quantity is positive integer
-    - Try calling storefront.add_to_cart(product_id, qty)
-    - Catch and display ValueError (validation errors like stock, not found)
-    - Show success message if added
-    - Pause for user to read
-    """
-    pass
+    """Handle adding product to cart (Scenario 2, Step 4)."""
+    product_id = get_user_choice("Enter product ID: ")
+    
+    if not product_id:
+        print("Product ID cannot be empty.")
+        pause()
+        return
+    
+    qty_str = get_user_choice("Enter quantity (default 1): ")
+    qty = 1
+    
+    if qty_str:
+        try:
+            qty = int(qty_str)
+            if qty <= 0:
+                print("Quantity must be a positive integer.")
+                pause()
+                return
+        except ValueError:
+            print("Invalid quantity. Please enter a valid number.")
+            pause()
+            return
+    
+    try:
+        storefront.add_to_cart(product_id, qty)
+        print(f"Successfully added {qty} unit(s) of product {product_id} to cart.")
+    except ValueError as e:
+        print(f"Error: {e}")
+    
+    pause()
 
 
 def customer_update_cart(storefront: StoreFront) -> None:
-    """
-    Handle updating cart item quantity (Scenario 2, Step 6).
-
-    Args:
-        storefront: StoreFront instance
-
-    TODO:
-    - Show current cart first
-    - Prompt user for product ID to update
-    - Prompt user for new quantity
-    - Validate quantity is non-negative integer
-    - Try calling storefront.update_cart_quantity(product_id, qty)
-    - Catch and display ValueError (product not in cart, invalid qty)
-    - Show success message
-    - Pause for user to read
-    """
-    pass
+    """Handle updating cart item quantity (Scenario 2, Step 6)."""
+    items, subtotal = storefront.view_cart()
+    display_cart_items(items, subtotal)
+    
+    if not items:
+        pause()
+        return
+    
+    product_id = get_user_choice("\nEnter product ID to update: ")
+    
+    if not product_id:
+        print("Product ID cannot be empty.")
+        pause()
+        return
+    
+    qty_str = get_user_choice("Enter new quantity: ")
+    
+    try:
+        qty = int(qty_str)
+        if qty < 0:
+            print("Quantity must be a non-negative integer.")
+            pause()
+            return
+    except ValueError:
+        print("Invalid quantity. Please enter a valid number.")
+        pause()
+        return
+    
+    try:
+        storefront.update_cart_quantity(product_id, qty)
+        print(f"Successfully updated quantity for product {product_id} to {qty}.")
+    except ValueError as e:
+        print(f"Error: {e}")
+    
+    pause()
 
 
 def customer_remove_from_cart(storefront: StoreFront) -> None:
-    """
-    Handle removing item from cart (Scenario 2, Step 7).
-
-    Args:
-        storefront: StoreFront instance
-
-    TODO:
-    - Show current cart first
-    - Prompt user for product ID to remove
-    - Try calling storefront.remove_from_cart(product_id)
-    - Catch and display ValueError (product not in cart)
-    - Show success message
-    - Pause for user to read
-    """
-    pass
+    """Handle removing item from cart (Scenario 2, Step 7)."""
+    items, subtotal = storefront.view_cart()
+    display_cart_items(items, subtotal)
+    
+    if not items:
+        pause()
+        return
+    
+    product_id = get_user_choice("\nEnter product ID to remove: ")
+    
+    if not product_id:
+        print("Product ID cannot be empty.")
+        pause()
+        return
+    
+    try:
+        storefront.remove_from_cart(product_id)
+        print(f"Successfully removed product {product_id} from cart.")
+    except ValueError as e:
+        print(f"Error: {e}")
+    
+    pause()
 
 
 def customer_checkout(storefront: StoreFront) -> None:
-    """
-    Handle checkout process (Scenario 3).
-
-    Args:
-        storefront: StoreFront instance
-
-    TODO:
-    - Show current cart first (Step 1)
-    - Check if cart is empty; print error and return if so
-    - Print "Proceed to Checkout" (Step 2)
-    - Prompt for address fields (Step 3):
-      - street (show error if empty - Step 4)
-      - city
-      - state
-      - postcode (validate 4 digits - Step 4)
-    - If validation fails, show error and allow retry
-    - Once valid address entered (Step 5):
-      - Try calling storefront.proceed_to_checkout(street, city, state, postcode)
-      - Catch ValueError for address validation errors
-      - On success, unpack (order_id, message) tuple
-      - Display success message (Step 7): "Payment of ${amount} processed. Order #{order_id} confirmed"
-      - Confirm cart is cleared (Step 8)
-    - Pause for user to read
-    """
-    pass
+    """Handle checkout process (Scenario 3)."""
+    # Step 1: Show current cart
+    items, subtotal = storefront.view_cart()
+    display_cart_items(items, subtotal)
+    
+    if not items:
+        print("Cannot checkout with an empty cart.")
+        pause()
+        return
+    
+    # Step 2: Proceed to Checkout
+    print("\n===== Proceed to Checkout =====")
+    
+    # Step 3 & 4: Prompt for address fields with validation
+    while True:
+        street = get_user_choice("Enter street address: ")
+        if not street:
+            print("Error: Street address cannot be empty.")
+            continue
+        
+        city = get_user_choice("Enter city: ")
+        state = get_user_choice("Enter state: ")
+        postcode = get_user_choice("Enter postcode (4 digits): ")
+        
+        # Validate postcode (4 digits)
+        if not postcode.isdigit() or len(postcode) != 4:
+            print("Error: Postcode must be exactly 4 digits.")
+            retry = get_user_choice("Try again? (y/n): ")
+            if retry.lower() != 'y':
+                print("Checkout cancelled.")
+                pause()
+                return
+            continue
+        
+        # Step 5: Address entered successfully
+        try:
+            # Step 6 & 7: Process checkout
+            order_id, message = storefront.proceed_to_checkout(street, city, state, postcode)
+            print(f"\n{message}")
+            print(f"Order #{order_id} confirmed.")
+            
+            # Step 8: Verify cart is cleared
+            items, subtotal = storefront.view_cart()
+            if not items:
+                print("Cart has been cleared.")
+            
+            break
+        except ValueError as e:
+            print(f"Error: {e}")
+            retry = get_user_choice("Try again? (y/n): ")
+            if retry.lower() != 'y':
+                print("Checkout cancelled.")
+                break
+    
+    pause()
 
 
 def customer_mode(storefront: StoreFront) -> None:
-    """
-    Main loop for customer mode operations.
-
-    Args:
-        storefront: StoreFront instance
-
-    TODO:
-    - Loop until user chooses to go back
-    - Clear screen and display customer menu
-    - Get user choice
-    - Use if/elif to route to appropriate function:
-      - 1: customer_browse_all()
-      - 2: customer_search()
-      - 3: customer_filter_by_category()
-      - 4: customer_view_cart()
-      - 5: customer_add_to_cart()
-      - 6: customer_update_cart()
-      - 7: customer_remove_from_cart()
-      - 8: customer_checkout()
-      - 9: break (back to main menu)
-      - Invalid: show error message
-    - Handle any unexpected exceptions gracefully
-    """
-    pass
+    """Main loop for customer mode operations."""
+    while True:
+        try:
+            clear_screen()
+            display_banner()
+            display_customer_menu()
+            
+            choice = get_user_choice()
+            
+            if choice == '1':
+                customer_browse_all(storefront)
+            elif choice == '2':
+                customer_search(storefront)
+            elif choice == '3':
+                customer_filter_by_category(storefront)
+            elif choice == '4':
+                customer_view_cart(storefront)
+            elif choice == '5':
+                customer_add_to_cart(storefront)
+            elif choice == '6':
+                customer_update_cart(storefront)
+            elif choice == '7':
+                customer_remove_from_cart(storefront)
+            elif choice == '8':
+                customer_checkout(storefront)
+            elif choice == '9':
+                break
+            else:
+                print("Invalid choice. Please enter a number between 1 and 9.")
+                pause()
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            pause()
 
 
 # ========== Kale's Sections Below ==========
