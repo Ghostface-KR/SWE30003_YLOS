@@ -1,10 +1,6 @@
 from decimal import Decimal
-from typing import Protocol
-
-# TODO: Move CartProtocol to a shared protocols.py to avoid circular dependencies
-class CartProtocol(Protocol):
-    def subtotal(self) -> Decimal:
-        ...
+from typing import Optional
+from protocols import CartPort
 
 class ShippingPolicy:
     """
@@ -14,41 +10,23 @@ class ShippingPolicy:
     Note: The `address` parameter is accepted but not yet used in calculations.
     """
 
-    def __init__(self, flat_rate: Decimal = Decimal("7.50"), free_over: Decimal | None = None) -> None:
-        # Use setters to apply validation on initialization
-        self.flat_rate = flat_rate
-        self.free_over = free_over
-
-    # ----- Properties with simple guards (get/set if you extend) -----
-    @property
-    def flat_rate(self) -> Decimal:
-        return self._flat_rate
-
-    @flat_rate.setter
-    def flat_rate(self, value: Decimal) -> None:
-        # Validate that flat_rate is a non-negative Decimal; raise a clear error if invalid.
-        if not isinstance(value, Decimal):
+    def __init__(self, flat_rate: Decimal = Decimal("7.50"), free_over: Optional[Decimal] = None) -> None:
+        # Validate and set configuration (properties removed; validation in __init__)
+        if not isinstance(flat_rate, Decimal):
             raise TypeError("flat_rate must be a Decimal")
-        if value < Decimal("0.00"):
+        if flat_rate < Decimal("0.00"):
             raise ValueError("flat_rate cannot be negative")
-        self._flat_rate = value
+        self._flat_rate = flat_rate
 
-    @property
-    def free_over(self) -> Decimal | None:
-        return self._free_over
-
-    @free_over.setter
-    def free_over(self, value: Decimal | None) -> None:
-        # Validate that free_over is either None (disabled) or a non-negative Decimal; raise a clear error if invalid.
-        if value is not None:
-            if not isinstance(value, Decimal):
+        if free_over is not None:
+            if not isinstance(free_over, Decimal):
                 raise TypeError("free_over must be a Decimal or None")
-            if value < Decimal("0.00"):
+            if free_over < Decimal("0.00"):
                 raise ValueError("free_over cannot be negative")
-        self._free_over = value
+        self._free_over = free_over
 
     # ----- Behavior -----
-    def cost_for(self, cart: CartProtocol, address: object) -> Decimal:
+    def cost_for(self, cart: CartPort, address: object) -> Decimal:
         """
         Return the shipping cost for the given cart + address.
         """
@@ -62,6 +40,6 @@ class ShippingPolicy:
         if self._free_over is not None and cart_subtotal >= self._free_over:
             return Decimal("0.00")
 
-        return self.flat_rate
+        return self._flat_rate
 
         # Optional: extend later with address-based rules (e.g., postcode/state/region surcharges) without changing this method's public signature.

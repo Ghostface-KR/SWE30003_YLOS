@@ -7,7 +7,7 @@ class CartItem:
     """
 
     def __init__(self, product_id: str, name: str, unit_price: Decimal, qty: int) -> None:
-        # "private-ish" storage with name-mangling for price and qty to discourage direct edits
+        # "private-ish" storage using single leading underscores for consistency
 
         self._product_id = product_id          # read-only (public via property)
         self._name = name                      # read-only (public via property)
@@ -15,10 +15,10 @@ class CartItem:
         unit_price = Decimal(str(unit_price))  # convert once to Decimal (avoids float artifacts)
         if unit_price < 0:
             raise ValueError("unit_price must be >= 0")
-        self.__unit_price = unit_price
+        self._unit_price = unit_price
         if qty < 1:
             raise ValueError("qty must be >= 1")  # Ensure quantity is at least 1
-        self.__qty = qty                       # guarded by property
+        self._qty = qty                        # guarded by property
 
 
     # ----- Read-only public properties -----
@@ -33,12 +33,12 @@ class CartItem:
     @property
     def unit_price(self) -> Decimal:
         """Unit price captured at add-time (read-only)."""
-        return self.__unit_price
+        return self._unit_price
 
     @property
     def qty(self) -> int:
         """Quantity for this line (read-only)."""
-        return self.__qty
+        return self._qty
 
     # ----- Behavior -----
     def subtotal(self) -> Decimal:
@@ -46,7 +46,7 @@ class CartItem:
         Line total at the captured price.
         """
         # Calculate and return the subtotal for cart item.
-        subtotal = (self.unit_price * self.__qty)
+        subtotal = (self.unit_price * self._qty)
         return subtotal
 
 

@@ -1,9 +1,6 @@
 from decimal import Decimal
-from typing import Tuple, Optional, Protocol
-
-class PaymentGatewayPort(Protocol):
-    def charge(self, order_id: str, amount: Decimal) -> Tuple[bool, str]:
-        ...
+from typing import Tuple, Optional
+from protocols import PaymentGatewayPort
 
 class PaymentService:
     """
@@ -13,11 +10,6 @@ class PaymentService:
 
     def __init__(self, gateway: Optional[PaymentGatewayPort] = None) -> None:
         self._gateway = gateway  # internal collaborator (optional)
-
-    @property
-    def gateway(self) -> Optional[PaymentGatewayPort]:
-        """Read-only access to the underlying gateway (if any)."""
-        return self._gateway
 
     def charge(self, order_id: str, amount: Decimal) -> Tuple[bool, str]:
         """
