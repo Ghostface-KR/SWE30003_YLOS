@@ -4,7 +4,7 @@ Member 3 responsibility
 Complexity: Medium
 """
 
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List, Dict, Any, Tuple
 from decimal import Decimal
 
 
@@ -18,18 +18,18 @@ class StoreFront:
     def __init__(self, catalogue: Any, cart: Any, checkout_service: Any) -> None:
         """
         Initialize the storefront with its subsystems.
-        
-        Args:
-            catalogue: Catalogue instance for product operations
-            cart: Cart instance for shopping cart operations
-            checkout_service: CheckoutService instance for order processing
-            
-        TODO:
-        - Store all collaborators as private attributes
-        - Do not expose these as properties (encapsulation)
-        - Validate that required collaborators are provided
         """
-        pass
+        if catalogue is None:
+            raise ValueError("catalogue is required")
+        if cart is None:
+            raise ValueError("cart is required")
+        if checkout_service is None:
+            raise ValueError("checkout_service is required")
+
+        # private collaborators (not exposed)
+        self._catalogue = catalogue
+        self._cart = cart
+        self._checkout_service = checkout_service
 
     # ----- Product Browsing (delegates to Catalogue) -----
 
@@ -37,51 +37,26 @@ class StoreFront:
         """
         Browse all available products.
         Used in Scenario 2.
-        
-        Returns:
-            List of product dictionaries
-            
-        TODO:
-        - Delegate to catalogue.get_all_products()
-        - Return the result directly
-        - No additional logic needed (pure delegation)
         """
-        pass
+        return self._catalogue.get_all_products()
 
     def search_products(self, query: str) -> List[Dict[str, Any]]:
         """
         Search for products by keyword.
         Used in Scenario 2.
-        
-        Args:
-            query: Search term
-            
-        Returns:
-            List of matching products
-            
-        TODO:
-        - Delegate to catalogue.search_products(query)
-        - Return the result
-        - Consider handling empty query (return all or empty list)
         """
-        pass
+        q = (query or "").strip()
+        if not q:
+            # reasonable behaviour: return all when query empty
+            return self._catalogue.get_all_products()
+        return self._catalogue.search_products(q)
 
     def filter_products_by_category(self, type_id: str) -> List[Dict[str, Any]]:
         """
         Filter products by category.
         Used in Scenario 2.
-        
-        Args:
-            type_id: Product type to filter by
-            
-        Returns:
-            List of products in category
-            
-        TODO:
-        - Delegate to catalogue.filter_by_type(type_id)
-        - Return the result
         """
-        pass
+        return self._catalogue.filter_by_type(type_id)
 
     # ----- Cart Operations (delegates to Cart) -----
 
@@ -89,62 +64,41 @@ class StoreFront:
         """
         Add product to shopping cart.
         Used in Scenario 2.
-        
-        Args:
-            product_id: Product to add
-            qty: Quantity to add
-            
-        TODO:
-        - Delegate to cart.add(product_id, qty)
-        - Let Cart handle all validation and errors
-        - No additional logic needed
         """
-        pass
+        self._cart.add(product_id, qty)
 
     def view_cart(self) -> Tuple[List[Dict[str, Any]], Decimal]:
         """
         View current cart contents and total.
         Used in Scenarios 2 and 3.
-        
-        Returns:
-            Tuple of (list of cart items as dicts, subtotal)
-            
-        TODO:
-        - Get cart items via cart.items()
-        - Convert each CartItem to dictionary format with keys: 'product_id', 'name', 'unit_price', 'qty', 'subtotal'
-        - Get subtotal via cart.subtotal()
-        - Return tuple of (items_list, subtotal)
         """
-        pass
+        items_dicts: List[Dict[str, Any]] = []
+        for ci in self._cart.items():
+            # CartItem exposes properties and subtotal()
+            items_dicts.append(
+                {
+                    "product_id": getattr(ci, "product_id"),
+                    "name": getattr(ci, "name"),
+                    "unit_price": getattr(ci, "unit_price"),
+                    "qty": getattr(ci, "qty"),
+                    "subtotal": ci.subtotal(),
+                }
+            )
+        return items_dicts, self._cart.subtotal()
 
     def update_cart_quantity(self, product_id: str, qty: int) -> None:
         """
         Update quantity of item in cart.
         Used in Scenario 2.
-        
-        Args:
-            product_id: Product to update
-            qty: New quantity (0 to remove)
-            
-        TODO:
-        - Delegate to cart.update_qty(product_id, qty)
-        - Let Cart handle validation and removal logic
         """
-        pass
+        self._cart.update_qty(product_id, qty)
 
     def remove_from_cart(self, product_id: str) -> None:
         """
         Remove item from cart entirely.
         Used in Scenario 2.
-        
-        Args:
-            product_id: Product to remove
-            
-        TODO:
-        - Delegate to cart.remove(product_id)
-        - Let Cart handle validation
         """
-        pass
+        self._cart.remove(product_id)
 
     # ----- Checkout (delegates to CheckoutService) -----
 
@@ -152,23 +106,12 @@ class StoreFront:
         """
         Process checkout with delivery address.
         Used in Scenario 3.
-        
-        Args:
-            street: Street address
-            city: City name
-            state: State abbreviation
-            postcode: Postal code
-            
-        Returns:
-            Tuple of (order_id, message)
-            
-        TODO:
-        - Create Address instance from parameters
-        - Delegate to checkout_service.place_order(address)
-        - Return the (order_id, message) tuple from place_order
-        - Let CheckoutService handle all validation, payment, and cart clearing
         """
-        pass
+        # local import to avoid circulars and keep module boundaries clean
+        from ..checkout.address import Address
+
+        address = Address(street, city, state, postcode)
+        return self._checkout_service.place_order(address)
 
     # Methods that would be implemented in full system but not needed for scenarios:
     # - login(email: str, password: str) -> bool
