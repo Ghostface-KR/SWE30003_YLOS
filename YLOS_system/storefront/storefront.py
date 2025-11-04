@@ -51,12 +51,12 @@ class StoreFront:
             return self._catalogue.get_all_products()
         return self._catalogue.search_products(q)
 
-    def filter_products_by_category(self, type_id: str) -> List[Dict[str, Any]]:
+    def filter_products_by_category(self, category: str) -> List[Dict[str, Any]]:
         """
         Filter products by category.
         Used in Scenario 2.
         """
-        return self._catalogue.filter_by_type(type_id)
+        return self._catalogue.filter_by_type(category)
 
     # ----- Cart Operations (delegates to Cart) -----
 
@@ -108,7 +108,7 @@ class StoreFront:
         Used in Scenario 3.
         """
         # local import to avoid circulars and keep module boundaries clean
-        from address import Address
+        from YLOS_system.checkout.address import Address
 
         address = Address(street, city, state, postcode)
         return self._checkout_service.place_order(address)

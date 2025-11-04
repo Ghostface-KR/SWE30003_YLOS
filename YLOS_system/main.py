@@ -18,14 +18,14 @@ Scenarios demonstrated:
 from decimal import Decimal, InvalidOperation
 from typing import Optional, Tuple
 
-from YLOS_system.catalogue.catalogue import Catalogue
-from YLOS_system.catalogue.product import Product
-from YLOS_system.catalogue.product_type import ProductType
-from YLOS_system.checkout.cart import Cart
-from YLOS_system.checkout.checkout_service import CheckoutService
-from YLOS_system.checkout.payment_service import PaymentService
-from YLOS_system.checkout.shipping_policy import ShippingPolicy
-from YLOS_system.storefront.storefront import StoreFront
+from .catalogue.catalogue import Catalogue
+from .catalogue.product import Product
+from .checkout.cart import Cart
+from .checkout.checkout_service import CheckoutService
+from .checkout.payment_service import PaymentService
+from .checkout.shipping_policy import ShippingPolicy
+from .storefront.storefront import StoreFront
+from .checkout.address import Address
 from YLOS_system.checkout.address import Address
 
 # Optional: for clearing console

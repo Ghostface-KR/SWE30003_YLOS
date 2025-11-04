@@ -18,7 +18,7 @@ class CataloguePort(Protocol):
         Retrieve product information.
 
         Returns:
-            Optional dictionary with keys: 'name', 'price', 'stock', 'type_id'
+            Optional dictionary with keys: 'name', 'price', 'stock', 'category'
             Returns None if product not found
         """
         ...

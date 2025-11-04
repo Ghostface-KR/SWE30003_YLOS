@@ -21,7 +21,7 @@ class Catalogue:
             self.products = [Product(
                 product_id=item["product_id"],
                 name=item["name"],
-                type_id=item.get("category", item.get("type_id", "")),
+                category=item.get("category", ""),
                 price=item["price"],
                 stock=item["stock"]
             ) for item in data]
@@ -34,7 +34,7 @@ class Catalogue:
                 "name": p.name,
                 "price": p.price,
                 "stock": p.stock,
-                "category": p.type_id
+                "category": p.category
             } for p in self.products]
             json.dump(products_list, f, indent=2)
 
@@ -45,16 +45,16 @@ class Catalogue:
             "name": p.name,
             "price": Decimal(str(p.price)),
             "stock": p.stock,
-            "type_id": p.type_id
+            "category": p.category
         } for p in self.products]
 
     def add_product(self, product_id: str, name: str, price: float,
-                    stock: int, type_id: str) -> None:
+                    stock: int, category: str) -> None:
         # Validation
         if any(p.product_id == product_id for p in self.products):
             raise ValueError(f"Product '{product_id}' already exists")
 
-        product = Product(product_id, name, type_id, price, stock)
+        product = Product(product_id, name, category, price, stock)
         self.products.append(product)
         self.save_to_file()
 
@@ -93,7 +93,7 @@ class Catalogue:
             "name": p.name,
             "price": Decimal(str(p.price)),
             "stock": p.stock,
-            "type_id": p.type_id
+            "category": p.category
         } for p in matches]
 
     def filter_by_type(self, type_id: str) -> List[Dict[str, Any]]:
@@ -101,14 +101,14 @@ class Catalogue:
             raise ValueError("type_id must be non-empty")
 
         keyword = type_id.strip().lower()
-        matches = [p for p in self.products if p.type_id and p.type_id.lower() == keyword]
+        matches = [p for p in self.products if p.category and p.category.lower() == keyword]
         return [{
             "product_id": p.product_id,
             "id": p.product_id,
             "name": p.name,
             "price": Decimal(str(p.price)),
             "stock": p.stock,
-            "type_id": p.type_id
+            "category": p.category
         } for p in matches]
 
     def get_product(self, product_id: str) -> Optional[Dict[str, Any]]:
@@ -123,6 +123,6 @@ class Catalogue:
                     "name": p.name,
                     "price": Decimal(str(p.price)),
                     "stock": p.stock,
-                    "type_id": p.type_id
+                    "category": p.category
                 }
         return None
