@@ -6,9 +6,12 @@ from decimal import Decimal
 
 
 class Catalogue:
-    def __init__(self, data_file="data/products.json"):
+    def __init__(self, data_file: Optional[str] = None):
+        if data_file is None:
+            # Look in YLOS_system/data/ (same package)
+            data_file = Path(__file__).parent.parent / "data" / "products.json"
         self.data_file = Path(data_file)
-        self.products = []  # List of Product objects
+        self.products: List[Product] = []
         self.load_from_file()
 
     def load_from_file(self):
@@ -16,15 +19,14 @@ class Catalogue:
             self.products = []
             return
 
-        with open(self.data_file, "r") as f:
-            data = json.load(f)
-            self.products = [Product(
-                product_id=item["product_id"],
-                name=item["name"],
-                category=item.get("category", ""),
-                price=item["price"],
-                stock=item["stock"]
-            ) for item in data]
+        data = json.loads(self.data_file.read_text(encoding="utf-8"))
+        self.products = [Product(
+            product_id=item["product_id"],
+            name=item["name"],
+            category=item.get("category", ""),
+            price=item["price"],
+            stock=item["stock"]
+        ) for item in data]
 
     def save_to_file(self):
         self.data_file.parent.mkdir(parents=True, exist_ok=True)
@@ -32,7 +34,7 @@ class Catalogue:
             products_list = [{
                 "product_id": p.product_id,
                 "name": p.name,
-                "price": p.price,
+                "price": float(p.price),
                 "stock": p.stock,
                 "category": p.category
             } for p in self.products]

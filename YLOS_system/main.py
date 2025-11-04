@@ -26,7 +26,6 @@ from .checkout.payment_service import PaymentService
 from .checkout.shipping_policy import ShippingPolicy
 from .storefront.storefront import StoreFront
 from .checkout.address import Address
-from YLOS_system.checkout.address import Address
 
 # Optional: for clearing console
 import os
@@ -48,6 +47,14 @@ def display_banner() -> None:
     print("\n" + "="*50)
     print("    YOUR LOCAL SHOP - Online Store")
     print("    Quality Products at Your Fingertips")
+    print("="*50 + "\n")
+
+
+def exit_program() -> None:
+    """Handle program exit gracefully."""
+    print("\n" + "="*50)
+    print("  Thank you for shopping at Your Local Shop!")
+    print("  We look forward to serving you again soon.")
     print("="*50 + "\n")
 
 
@@ -183,10 +190,12 @@ def customer_search(storefront: StoreFront) -> None:
 def customer_filter_by_category(storefront: StoreFront) -> None:
     """Handle filtering by category (Scenario 2, Step 3)."""
     print("\nAvailable Categories:")
-    print("- Electronics")
-    print("- Clothing")
-    print("- Books")
-    print("- Home")
+    print("- Daily Essentials")
+    print("- Fruit")
+    print("- Vegetables")
+    print("- Snacks")
+    print("- Pantry")
+    print("- Beverages")
 
     category = get_user_choice("\nEnter category name: ")
 
@@ -596,21 +605,25 @@ def admin_mode(catalogue: Catalogue) -> None:
         catalogue: Catalogue instance
     """
     while True:
-        clear_screen()
-        display_admin_menu()
-        choice = input("Enter choice (1-5): ").strip()
-        if choice == "1":
-            admin_view_products(catalogue)
-        elif choice == "2":
-            admin_add_product(catalogue)
-        elif choice == "3":
-            admin_update_product(catalogue)
-        elif choice == "4":
-            admin_delete_product(catalogue)
-        elif choice == "5":
-            break
-        else:
-            print("Invalid choice.")
+        try:
+            clear_screen()
+            display_admin_menu()
+            choice = input("Enter choice (1-5): ").strip()
+            if choice == "1":
+                admin_view_products(catalogue)
+            elif choice == "2":
+                admin_add_product(catalogue)
+            elif choice == "3":
+                admin_update_product(catalogue)
+            elif choice == "4":
+                admin_delete_product(catalogue)
+            elif choice == "5":
+                break
+            else:
+                print("Invalid choice.")
+                pause()
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
             pause()
 
 
@@ -624,7 +637,7 @@ def bootstrap_system() -> Tuple[Catalogue, StoreFront]:
     Returns:
         Tuple of (Catalogue, StoreFront) for access in main loop
     """
-    catalogue = Catalogue(data_file="../data/products.json")
+    catalogue = Catalogue()
 
     cart = Cart(catalogue)
     shipping_policy = ShippingPolicy()
@@ -661,14 +674,14 @@ def main() -> None:
             elif choice == "2":
                 admin_mode(catalogue)
             elif choice == "3":
-                print("Goodbye!")
+                exit_program()
                 break
             else:
                 print("Invalid choice.")
                 pause()
 
     except KeyboardInterrupt:
-        print("\nGoodbye!")
+        exit_program()
     except Exception as e:
         print(f"Error: {e}")
         pause()
@@ -676,3 +689,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+# python3 -m YLOS_system.main
