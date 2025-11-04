@@ -1,6 +1,6 @@
 from decimal import Decimal
 from typing import Optional
-from protocols import CartPort
+from YLOS_system.protocols import CartPort
 
 class ShippingPolicy:
     """

@@ -1,6 +1,9 @@
+from __future__ import annotations
 from decimal import Decimal
-from typing import Dict, List, Optional, Callable, Any
+from typing import Dict, List, Optional, Callable
 import datetime
+from .cart_item import CartItem
+from YLOS_system.protocols import CataloguePort
 
 class Cart:
     """

@@ -108,7 +108,7 @@ class StoreFront:
         Used in Scenario 3.
         """
         # local import to avoid circulars and keep module boundaries clean
-        from ..checkout.address import Address
+        from address import Address
 
         address = Address(street, city, state, postcode)
         return self._checkout_service.place_order(address)

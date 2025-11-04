@@ -1,6 +1,6 @@
 from decimal import Decimal
 from typing import Tuple, Optional
-from protocols import PaymentGatewayPort
+from YLOS_system.protocols import PaymentGatewayPort
 
 class PaymentService:
     """

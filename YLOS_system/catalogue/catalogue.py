@@ -1,73 +1,128 @@
-from YLOS_system.catalogue.product import Product
-import json 
+from .product import Product
+from typing import List, Optional, Dict, Any
+import json
 from pathlib import Path
+from decimal import Decimal
+
 
 class Catalogue:
     def __init__(self, data_file="data/products.json"):
         self.data_file = Path(data_file)
-        self.products = []
+        self.products = []  # List of Product objects
         self.load_from_file()
-
-    #Save products to a file (acting as a database)
 
     def load_from_file(self):
         if not self.data_file.exists():
-            print("No product data file found")
             self.products = []
             return
-        
+
         with open(self.data_file, "r") as f:
             data = json.load(f)
-            self.products = [Product(**p) for p in data]
-    
-    def save_to_file(self):
-        #Save all products to JSON file.
-        with open(self.data_file, "w") as f:
-            json.dump([p.__dict__ for p in self.products], f, indent=2)    
-    
-    #Core Catalogue functions 
-    def browse_all(self):
-        return self.products
+            self.products = [Product(
+                product_id=item["product_id"],
+                name=item["name"],
+                type_id=item.get("category", item.get("type_id", "")),
+                price=item["price"],
+                stock=item["stock"]
+            ) for item in data]
 
-    def add_product(self, product):
+    def save_to_file(self):
+        self.data_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.data_file, "w") as f:
+            products_list = [{
+                "product_id": p.product_id,
+                "name": p.name,
+                "price": p.price,
+                "stock": p.stock,
+                "category": p.type_id
+            } for p in self.products]
+            json.dump(products_list, f, indent=2)
+
+    def get_all_products(self) -> List[Dict[str, Any]]:
+        return [{
+            "product_id": p.product_id,
+            "id": p.product_id,     # alias used by UI tables
+            "name": p.name,
+            "price": Decimal(str(p.price)),
+            "stock": p.stock,
+            "type_id": p.type_id
+        } for p in self.products]
+
+    def add_product(self, product_id: str, name: str, price: float,
+                    stock: int, type_id: str) -> None:
+        # Validation
+        if any(p.product_id == product_id for p in self.products):
+            raise ValueError(f"Product '{product_id}' already exists")
+
+        product = Product(product_id, name, type_id, price, stock)
         self.products.append(product)
         self.save_to_file()
 
-    def delete_product(self, product_id):
-        self.products = [p for p in self.products if str(p.product_id) != str(product_id)]
+    def delete_product(self, product_id: str) -> None:
+        original_length = len(self.products)
+        self.products = [p for p in self.products if p.product_id != product_id]
+        if len(self.products) == original_length:
+            raise ValueError(f"Product '{product_id}' not found")
         self.save_to_file()
 
-    def modify_product(self, product_id, name=None, category=None, price=None, stock=None):
+    def update_product(self, product_id: str, name: Optional[str] = None,
+                       price: Optional[float] = None, stock: Optional[int] = None) -> None:
         for p in self.products:
-            if str(p.product_id) == str(product_id):
+            if p.product_id == product_id:
                 if name is not None:
                     p.name = name
-                if category is not None:
-                    p.category = category
                 if price is not None:
                     p.price = price
                 if stock is not None:
                     p.stock = stock
                 self.save_to_file()
                 return
-        raise ValueError("Product not found")
+        raise ValueError(f"Product '{product_id}' not found")
 
-    def search_by_name(self, keyword):
-        return [p for p in self.products if keyword.lower() in p.name.lower()]
+    def search_products(self, query: str) -> List[Dict[str, Any]]:
+        if not isinstance(query, str):
+            raise ValueError("query must be a string")
+        keyword = query.strip().lower()
+        if keyword == "":
+            return self.get_all_products()
 
-    def filter_by_category(self, category):
-        return [p for p in self.products if p.category.lower() == category.lower()]
+        matches = [p for p in self.products if keyword in p.name.lower()]
+        return [{
+            "product_id": p.product_id,
+            "id": p.product_id,
+            "name": p.name,
+            "price": Decimal(str(p.price)),
+            "stock": p.stock,
+            "type_id": p.type_id
+        } for p in matches]
 
-    def get_available_categories(self):
-        return sorted(set(p.category for p in self.products))
-    
-    def get_product(self, product_id):
+    def filter_by_type(self, type_id: str) -> List[Dict[str, Any]]:
+        if not type_id:
+            raise ValueError("type_id must be non-empty")
+
+        keyword = type_id.strip().lower()
+        matches = [p for p in self.products if p.type_id and p.type_id.lower() == keyword]
+        return [{
+            "product_id": p.product_id,
+            "id": p.product_id,
+            "name": p.name,
+            "price": Decimal(str(p.price)),
+            "stock": p.stock,
+            "type_id": p.type_id
+        } for p in matches]
+
+    def get_product(self, product_id: str) -> Optional[Dict[str, Any]]:
+        if not product_id:
+            raise ValueError("product_id must be non-empty")
+
         for p in self.products:
-            if str(p.product_id) == str(product_id):
+            if p.product_id == product_id:
                 return {
+                    "product_id": p.product_id,
                     "id": p.product_id,
                     "name": p.name,
-                    "price": float(p.price),
-                    "stock": getattr(p, "stock", 0)
+                    "price": Decimal(str(p.price)),
+                    "stock": p.stock,
+                    "type_id": p.type_id
                 }
         return None

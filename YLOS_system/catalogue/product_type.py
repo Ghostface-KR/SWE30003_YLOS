@@ -21,7 +21,7 @@ class ProductType:
             type_id: Unique identifier for this type
             name: Display name (e.g., "Daily Essentials", "Specialty Items")
             description: Optional description of this category
-            
+
         TODO:
         - Validate type_id is non-empty string
         - Validate name is non-empty string
@@ -34,7 +34,7 @@ class ProductType:
     def type_id(self) -> str:
         """
         Read-only access to type ID.
-        
+
         TODO:
         - Return the stored type_id
         """
@@ -44,7 +44,7 @@ class ProductType:
     def name(self) -> str:
         """
         Read-only access to type name.
-        
+
         TODO:
         - Return the stored name
         """
@@ -54,7 +54,7 @@ class ProductType:
     def description(self) -> Optional[str]:
         """
         Read-only access to type description.
-        
+
         TODO:
         - Return the stored description (may be None)
         """
@@ -63,10 +63,10 @@ class ProductType:
     def to_dict(self) -> dict:
         """
         Convert to dictionary format.
-        
+
         Returns:
             Dictionary with type attributes
-            
+
         TODO:
         - Create dictionary with keys: 'id', 'name', 'description'
         - Return the dictionary

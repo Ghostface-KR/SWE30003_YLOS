@@ -1,13 +1,12 @@
+from __future__ import annotations
 import uuid
 import datetime
 from decimal import Decimal
-from typing import Tuple, Optional, Callable, Any
+from typing import Tuple, Optional, Any
 
-from order_item import OrderItem
-from order import Order
-
-
-from .cart import Cart           # uncomment when wiring
+from ..orders.order_item import OrderItem
+from ..orders.order import Order
+from .cart import Cart
 from .shipping_policy import ShippingPolicy
 from .payment_service import PaymentService
 from .address import Address
@@ -78,7 +77,7 @@ class CheckoutService:
     ) -> Tuple[str, str]:
         """
         Validate address; compute shipping/total; create order (pending);
-        take payment; on success mark paid + clear cart; return (order_id, message).
+        take payment; on success mark paid + clear cart; return (order_id, standardized message).
         """
         # Create a pending order snapshot using helper method.
         subtotal, shipping, total = self.compute_totals(address)
@@ -108,24 +107,21 @@ class CheckoutService:
             # Clear cart only after successful payment.
             self._cart.clear()
             self._log("payment_success", order_id=order.id)
-            return (order.id, message)
+            # Standardize confirmation message for UI consistency
+            formatted_total = total.quantize(Decimal("0.01"))
+            confirmation = f"Payment of ${formatted_total} processed. Order {order.id} confirmed."
+            return (order.id, confirmation)
 
-        # Payment failed: keep order pending; return (order.id, message) for UI retry.
+        # Payment failed: keep order pending; return standardized message for UI retry.
         self._log("payment_failed", order_id=order.id, message=message)
 
-        return (order.id, message)
+        failure = f"Payment failed: {message}"
+        return (order.id, failure)
 
     # ----- Helper method to create order from cart -----
     def _create_order_from_cart(self, cart, address, shipping: Decimal) -> "Order":
         """
         Build and return a new Order object from the current cart snapshot.
-
-        Steps:
-        1) Generate unique order ID.
-        2) Copy CartItems into OrderItems (snapshot, no references).
-        3) Calculate subtotal and total (subtotal + shipping).
-        4) Attach address and shipping.
-        5) Set initial status to 'PENDING'.
         """
         # 1) ID
         order_id = uuid.uuid4().hex

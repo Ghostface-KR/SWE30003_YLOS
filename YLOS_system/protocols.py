@@ -3,7 +3,7 @@ Shared Protocol definitions for dependency injection and loose coupling.
 Protocols define interfaces without requiring inheritance.
 """
 
-from typing import Protocol, Dict, Any, Tuple, List
+from typing import Protocol, Dict, Any, Tuple, List, Optional
 from decimal import Decimal
 
 
@@ -12,13 +12,13 @@ class CataloguePort(Protocol):
     Interface for catalogue operations required by Cart.
     Allows Cart to look up current product information when adding items.
     """
-    
-    def get_product(self, product_id: str) -> Dict[str, Any]:
+
+    def get_product(self, product_id: str) -> Optional[Dict[str, Any]]:
         """
         Retrieve product information.
-        
+
         Returns:
-            Dictionary with keys: 'name', 'price', 'stock', 'type_id'
+            Optional dictionary with keys: 'name', 'price', 'stock', 'type_id'
             Returns None if product not found
         """
         ...
@@ -78,9 +78,4 @@ class LoggerPort(Protocol):
 
 # Additional protocols that might be needed for full system:
 # class NotificationPort(Protocol):
-#     def send_email(self, to: str, subject: str, body: str) -> bool: ...
-#     def send_sms(self, to: str, message: str) -> bool: ...
-#
 # class CourierPort(Protocol):
-#     def book_shipment(self, order_id: str, address: Any) -> Tuple[bool, str, str]: ...
-#     def get_tracking(self, tracking_number: str) -> Dict[str, Any]: ...

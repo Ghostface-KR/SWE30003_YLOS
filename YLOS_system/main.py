@@ -16,16 +16,17 @@ Scenarios demonstrated:
 """
 
 from decimal import Decimal, InvalidOperation
-from typing import Optional
+from typing import Optional, Tuple
 
-# Import domain classes
-from catalogue import Catalogue, Product, ProductType
-from cart import Cart
-from checkout_service import CheckoutService
-from payment_service import PaymentService
-from shipping_policy import ShippingPolicy
-from storefront import StoreFront
-from address import Address
+from YLOS_system.catalogue.catalogue import Catalogue
+from YLOS_system.catalogue.product import Product
+from YLOS_system.catalogue.product_type import ProductType
+from YLOS_system.checkout.cart import Cart
+from YLOS_system.checkout.checkout_service import CheckoutService
+from YLOS_system.checkout.payment_service import PaymentService
+from YLOS_system.checkout.shipping_policy import ShippingPolicy
+from YLOS_system.storefront.storefront import StoreFront
+from YLOS_system.checkout.address import Address
 
 # Optional: for clearing console
 import os
@@ -99,24 +100,24 @@ def display_products(products: list, title: str = "Products") -> None:
     """Display a list of products in formatted table."""
     print(f"\n===== {title} =====")
     print("-" * 70)
-    
+
     if not products:
         print("No products found.")
         print("-" * 70)
         return
-    
+
     print(f"{'ID':<5} | {'Name':<25} | {'Price':<10} | {'Stock':<10} | {'Category':<10}")
     print("-" * 70)
-    
+
     for product in products:
         product_id = product.get('id', 'N/A')
         name = product.get('name', 'N/A')
         price = product.get('price', 0)
         stock = product.get('stock', 0)
         type_id = product.get('type_id', 'N/A')
-        
+
         print(f"{product_id:<5} | {name:<25} | ${price:<9.2f} | {stock:<10} units | {type_id:<10}")
-    
+
     print("-" * 70)
 
 
@@ -124,23 +125,23 @@ def display_cart_items(items: list, subtotal: Decimal) -> None:
     """Display cart contents with subtotal."""
     print("\n===== Shopping Cart =====")
     print("-" * 70)
-    
+
     if not items:
         print("Cart is empty.")
         print("-" * 70)
         return
-    
+
     print(f"{'Product':<30} | {'Price':<10} | {'Qty':<5} | {'Subtotal':<10}")
     print("-" * 70)
-    
+
     for item in items:
         name = item.get('name', 'N/A')
         unit_price = item.get('unit_price', Decimal('0'))
         qty = item.get('qty', 0)
-        line_subtotal = item.get('line_subtotal', Decimal('0'))
-        
+        line_subtotal = item.get('subtotal', Decimal('0'))
+
         print(f"{name:<30} | ${unit_price:<9.2f} | {qty:<5} | ${line_subtotal:<9.2f}")
-    
+
     print("-" * 70)
     print(f"{'Subtotal:':<49} ${subtotal:.2f}")
     print("-" * 70)
@@ -163,19 +164,19 @@ def customer_browse_all(storefront: StoreFront) -> None:
 def customer_search(storefront: StoreFront) -> None:
     """Handle product search (Scenario 2, Step 2)."""
     query = get_user_choice("Enter search keyword: ")
-    
+
     if not query:
         print("Search keyword cannot be empty.")
         pause()
         return
-    
+
     products = storefront.search_products(query)
-    
+
     if not products:
         print(f"No products found matching '{query}'.")
     else:
         display_products(products, f"Search Results for '{query}'")
-    
+
     pause()
 
 
@@ -186,21 +187,21 @@ def customer_filter_by_category(storefront: StoreFront) -> None:
     print("- Clothing")
     print("- Books")
     print("- Home")
-    
+
     category = get_user_choice("\nEnter category name: ")
-    
+
     if not category:
         print("Category name cannot be empty.")
         pause()
         return
-    
+
     products = storefront.filter_products_by_category(category)
-    
+
     if not products:
         print(f"No products found in category '{category}'.")
     else:
         display_products(products, f"Products in '{category}' Category")
-    
+
     pause()
 
 
@@ -214,15 +215,15 @@ def customer_view_cart(storefront: StoreFront) -> None:
 def customer_add_to_cart(storefront: StoreFront) -> None:
     """Handle adding product to cart (Scenario 2, Step 4)."""
     product_id = get_user_choice("Enter product ID: ")
-    
+
     if not product_id:
         print("Product ID cannot be empty.")
         pause()
         return
-    
+
     qty_str = get_user_choice("Enter quantity (default 1): ")
     qty = 1
-    
+
     if qty_str:
         try:
             qty = int(qty_str)
@@ -234,13 +235,13 @@ def customer_add_to_cart(storefront: StoreFront) -> None:
             print("Invalid quantity. Please enter a valid number.")
             pause()
             return
-    
+
     try:
         storefront.add_to_cart(product_id, qty)
         print(f"Successfully added {qty} unit(s) of product {product_id} to cart.")
     except ValueError as e:
         print(f"Error: {e}")
-    
+
     pause()
 
 
@@ -248,20 +249,20 @@ def customer_update_cart(storefront: StoreFront) -> None:
     """Handle updating cart item quantity (Scenario 2, Step 6)."""
     items, subtotal = storefront.view_cart()
     display_cart_items(items, subtotal)
-    
+
     if not items:
         pause()
         return
-    
+
     product_id = get_user_choice("\nEnter product ID to update: ")
-    
+
     if not product_id:
         print("Product ID cannot be empty.")
         pause()
         return
-    
+
     qty_str = get_user_choice("Enter new quantity: ")
-    
+
     try:
         qty = int(qty_str)
         if qty < 0:
@@ -272,13 +273,13 @@ def customer_update_cart(storefront: StoreFront) -> None:
         print("Invalid quantity. Please enter a valid number.")
         pause()
         return
-    
+
     try:
         storefront.update_cart_quantity(product_id, qty)
         print(f"Successfully updated quantity for product {product_id} to {qty}.")
     except ValueError as e:
         print(f"Error: {e}")
-    
+
     pause()
 
 
@@ -286,24 +287,24 @@ def customer_remove_from_cart(storefront: StoreFront) -> None:
     """Handle removing item from cart (Scenario 2, Step 7)."""
     items, subtotal = storefront.view_cart()
     display_cart_items(items, subtotal)
-    
+
     if not items:
         pause()
         return
-    
+
     product_id = get_user_choice("\nEnter product ID to remove: ")
-    
+
     if not product_id:
         print("Product ID cannot be empty.")
         pause()
         return
-    
+
     try:
         storefront.remove_from_cart(product_id)
         print(f"Successfully removed product {product_id} from cart.")
     except ValueError as e:
         print(f"Error: {e}")
-    
+
     pause()
 
 
@@ -312,26 +313,26 @@ def customer_checkout(storefront: StoreFront) -> None:
     # Step 1: Show current cart
     items, subtotal = storefront.view_cart()
     display_cart_items(items, subtotal)
-    
+
     if not items:
         print("Cannot checkout with an empty cart.")
         pause()
         return
-    
+
     # Step 2: Proceed to Checkout
     print("\n===== Proceed to Checkout =====")
-    
+
     # Step 3 & 4: Prompt for address fields with validation
     while True:
         street = get_user_choice("Enter street address: ")
         if not street:
             print("Error: Street address cannot be empty.")
             continue
-        
+
         city = get_user_choice("Enter city: ")
         state = get_user_choice("Enter state: ")
         postcode = get_user_choice("Enter postcode (4 digits): ")
-        
+
         # Validate postcode (4 digits)
         if not postcode.isdigit() or len(postcode) != 4:
             print("Error: Postcode must be exactly 4 digits.")
@@ -341,19 +342,19 @@ def customer_checkout(storefront: StoreFront) -> None:
                 pause()
                 return
             continue
-        
+
         # Step 5: Address entered successfully
         try:
             # Step 6 & 7: Process checkout
             order_id, message = storefront.proceed_to_checkout(street, city, state, postcode)
             print(f"\n{message}")
             print(f"Order #{order_id} confirmed.")
-            
+
             # Step 8: Verify cart is cleared
             items, subtotal = storefront.view_cart()
             if not items:
                 print("Cart has been cleared.")
-            
+
             break
         except ValueError as e:
             print(f"Error: {e}")
@@ -361,7 +362,7 @@ def customer_checkout(storefront: StoreFront) -> None:
             if retry.lower() != 'y':
                 print("Checkout cancelled.")
                 break
-    
+
     pause()
 
 
@@ -372,9 +373,9 @@ def customer_mode(storefront: StoreFront) -> None:
             clear_screen()
             display_banner()
             display_customer_menu()
-            
+
             choice = get_user_choice()
-            
+
             if choice == '1':
                 customer_browse_all(storefront)
             elif choice == '2':
@@ -420,11 +421,7 @@ def admin_view_products(catalogue: Catalogue) -> None:
         pause()
         return
 
-    rows = []
-    for product in products:
-        rows.append(product.to_dict())
-
-    display_products(rows, "All Products")
+    display_products(products, "All Products")
     pause()
 
 def admin_add_product(catalogue: Catalogue) -> None:
@@ -620,32 +617,14 @@ def admin_mode(catalogue: Catalogue) -> None:
 
 # ========== BOOTSTRAP & INITIALIZATION ==========
 
-def bootstrap_system() -> tuple[Catalogue, StoreFront]:
+def bootstrap_system() -> Tuple[Catalogue, StoreFront]:
     """
     Initialize all system components (bootstrap process from Assignment 2).
 
     Returns:
         Tuple of (Catalogue, StoreFront) for access in main loop
     """
-    catalogue = Catalogue()
-
-    # Register product types with Catalogue
-    catalogue.add_type("daily", "Daily Essentials", "Everyday basics and household staples.")
-    catalogue.add_type("special", "Specialty Items", "Gourmet and specialty products.")
-    catalogue.add_type("produce", "Fresh Produce", "Fruits and vegetables.")
-    catalogue.add_type("dairy", "Dairy", "Milk, cheese, yoghurt.")
-    catalogue.add_type("bakery", "Bakery", "Bread and pastries.")
-    catalogue.add_type("meat", "Meat & Poultry", "Beef, chicken, pork, and more.")
-    catalogue.add_type("seafood", "Seafood", "Fresh and frozen seafood.")
-    catalogue.add_type("frozen", "Frozen Foods", "Frozen meals, vegetables, desserts.")
-    catalogue.add_type("pantry", "Pantry", "Canned goods, sauces, oils, spices, baking.")
-    catalogue.add_type("snacks", "Snacks & Confectionery", "Chips, chocolate, lollies.")
-    catalogue.add_type("beverages", "Beverages", "Soft drinks, juices, water, coffee, tea.")
-    catalogue.add_type("breakfast", "Breakfast & Cereal", "Cereal, oats, spreads.")
-    catalogue.add_type("health", "Health & Beauty", "Personal care, toiletries.")
-    catalogue.add_type("household", "Household & Cleaning", "Cleaning supplies, paper goods.")
-    catalogue.add_type("baby", "Baby", "Nappies, wipes, baby food.")
-    catalogue.add_type("pet", "Pet Care", "Pet food and supplies.")
+    catalogue = Catalogue(data_file="../data/products.json")
 
     cart = Cart(catalogue)
     shipping_policy = ShippingPolicy()
