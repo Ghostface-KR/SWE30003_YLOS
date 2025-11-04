@@ -81,7 +81,7 @@ def display_admin_menu() -> None:
     print("1. View All Products")
     print("2. Add Product")
     print("3. Update Product")
-    print("4. Delete Product")
+print("4. Delete Product")
     print("5. Back to Main Menu")
     print("="*22)
 
