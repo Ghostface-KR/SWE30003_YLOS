@@ -1,0 +1,212 @@
+[
+  {
+    "product_id": "MILK001",
+    "name": "Milk",
+    "price": 3.50,
+    "stock": 20,
+    "category": "Daily Essentials"
+  },
+  {
+    "product_id": "BREAD001",
+    "name": "Bread",
+    "price": 4.20,
+    "stock": 15,
+    "category": "Daily Essentials"
+  },
+  {
+    "product_id": "EGGS001",
+    "name": "Eggs",
+    "price": 5.00,
+    "stock": 30,
+    "category": "Daily Essentials"
+  },
+  {
+    "product_id": "BUTTER001",
+    "name": "Butter",
+    "price": 6.50,
+    "stock": 12,
+    "category": "Daily Essentials"
+  },
+  {
+    "product_id": "CHEESE001",
+    "name": "Cheese",
+    "price": 8.00,
+    "stock": 25,
+    "category": "Daily Essentials"
+  },
+  {
+    "product_id": "APPLE001",
+    "name": "Apple",
+    "price": 1.00,
+    "stock": 50,
+    "category": "Fruit"
+  },
+  {
+    "product_id": "BANANA001",
+    "name": "Banana",
+    "price": 0.80,
+    "stock": 60,
+    "category": "Fruit"
+  },
+  {
+    "product_id": "ORANGE001",
+    "name": "Orange",
+    "price": 1.20,
+    "stock": 40,
+    "category": "Fruit"
+  },
+  {
+    "product_id": "STRAW001",
+    "name": "Strawberries",
+    "price": 4.50,
+    "stock": 20,
+    "category": "Fruit"
+  },
+  {
+    "product_id": "MANGO001",
+    "name": "Mango",
+    "price": 3.00,
+    "stock": 15,
+    "category": "Fruit"
+  },
+  {
+    "product_id": "CARROT001",
+    "name": "Carrots",
+    "price": 2.50,
+    "stock": 35,
+    "category": "Vegetables"
+  },
+  {
+    "product_id": "TOMATO001",
+    "name": "Tomatoes",
+    "price": 3.20,
+    "stock": 28,
+    "category": "Vegetables"
+  },
+  {
+    "product_id": "LETTUCE001",
+    "name": "Lettuce",
+    "price": 2.80,
+    "stock": 22,
+    "category": "Vegetables"
+  },
+  {
+    "product_id": "POTATO001",
+    "name": "Potatoes",
+    "price": 4.00,
+    "stock": 45,
+    "category": "Vegetables"
+  },
+  {
+    "product_id": "ONION001",
+    "name": "Onions",
+    "price": 2.20,
+    "stock": 38,
+    "category": "Vegetables"
+  },
+  {
+    "product_id": "CHOC001",
+    "name": "Chocolate Bar",
+    "price": 2.50,
+    "stock": 100,
+    "category": "Snacks"
+  },
+  {
+    "product_id": "CHIPS001",
+    "name": "Potato Chips",
+    "price": 3.50,
+    "stock": 75,
+    "category": "Snacks"
+  },
+  {
+    "product_id": "COOKIE001",
+    "name": "Cookies",
+    "price": 4.00,
+    "stock": 60,
+    "category": "Snacks"
+  },
+  {
+    "product_id": "NUTS001",
+    "name": "Mixed Nuts",
+    "price": 6.00,
+    "stock": 40,
+    "category": "Snacks"
+  },
+  {
+    "product_id": "POPCORN001",
+    "name": "Popcorn",
+    "price": 3.00,
+    "stock": 50,
+    "category": "Snacks"
+  },
+  {
+    "product_id": "RICE001",
+    "name": "Rice",
+    "price": 12.00,
+    "stock": 25,
+    "category": "Pantry"
+  },
+  {
+    "product_id": "PASTA001",
+    "name": "Pasta",
+    "price": 3.50,
+    "stock": 40,
+    "category": "Pantry"
+  },
+  {
+    "product_id": "FLOUR001",
+    "name": "Flour",
+    "price": 5.00,
+    "stock": 30,
+    "category": "Pantry"
+  },
+  {
+    "product_id": "SUGAR001",
+    "name": "Sugar",
+    "price": 4.50,
+    "stock": 35,
+    "category": "Pantry"
+  },
+  {
+    "product_id": "OIL001",
+    "name": "Cooking Oil",
+    "price": 8.00,
+    "stock": 20,
+    "category": "Pantry"
+  },
+  {
+    "product_id": "COFFEE001",
+    "name": "Coffee",
+    "price": 15.00,
+    "stock": 18,
+    "category": "Beverages"
+  },
+  {
+    "product_id": "TEA001",
+    "name": "Tea",
+    "price": 8.00,
+    "stock": 25,
+    "category": "Beverages"
+  },
+  {
+    "product_id": "JUICE001",
+    "name": "Orange Juice",
+    "price": 5.50,
+    "stock": 30,
+    "category": "Beverages"
+  },
+  {
+    "product_id": "SODA001",
+    "name": "Soda",
+    "price": 3.00,
+    "stock": 50,
+    "category": "Beverages"
+  },
+  {
+    "product_id": "WATER001",
+    "name": "Bottled Water",
+    "price": 2.00,
+    "stock": 100,
+    "category": "Beverages"
+  }
+]

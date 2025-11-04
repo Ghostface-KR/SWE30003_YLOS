@@ -1,0 +1,23 @@
+[
+  {
+    "product_id": "MILK1",
+    "name": "Milk",
+    "price": 3.5,
+    "stock": 50,
+    "category": "Daily Essentials"
+  },
+  {
+    "product_id": "BRED1",
+    "name": "Bread",
+    "price": 4.2,
+    "stock": 30,
+    "category": "Daily Essentials"
+  },
+  {
+    "product_id": "APPL1",
+    "name": "Apple",
+    "price": 1.1,
+    "stock": 100,
+    "category": "Fruit"
+  }
+]
