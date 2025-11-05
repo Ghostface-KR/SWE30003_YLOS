@@ -19,13 +19,9 @@ from decimal import Decimal, InvalidOperation
 from typing import Optional
 
 # Import domain classes
-from catalogue import Catalogue, Product, ProductType
-from cart import Cart
-from checkout_service import CheckoutService
-from payment_service import PaymentService
-from shipping_policy import ShippingPolicy
-from storefront import StoreFront
-from address import Address
+from YLOS_system.catalogue import catalogue, product, product_type
+from YLOS_system.checkout import payment_service, address, shipping_policy, cart, address
+from YLOS_system.storefront import storefront
 
 # Optional: for clearing console
 import os
