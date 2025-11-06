@@ -138,16 +138,18 @@ def display_cart_items(items: list, subtotal: Decimal) -> None:
         print("-" * 70)
         return
 
-    print(f"{'Product':<30} | {'Price':<10} | {'Qty':<5} | {'Subtotal':<10}")
+    print(f"{'ID':<5} | {'Product':<25} | {'Price':<10} | {'Qty':<5} | {'Subtotal':<10}")
     print("-" * 70)
 
     for item in items:
+        product_id = item.get('product_id', 'N/A')
         name = item.get('name', 'N/A')
         unit_price = item.get('unit_price', Decimal('0'))
         qty = item.get('qty', 0)
         line_subtotal = item.get('subtotal', Decimal('0'))
 
-        print(f"{name:<30} | ${unit_price:<9.2f} | {qty:<5} | ${line_subtotal:<9.2f}")
+        print(f"{product_id:<5} | {name:<25} | ${unit_price:<9.2f} | {qty:<5} | ${line_subtotal:<9.2f}")
+
 
     print("-" * 70)
     print(f"{'Subtotal:':<49} ${subtotal:.2f}")
@@ -223,13 +225,25 @@ def customer_view_cart(storefront: StoreFront) -> None:
 
 def customer_add_to_cart(storefront: StoreFront) -> None:
     """Handle adding product to cart (Scenario 2, Step 4)."""
-    product_id = get_user_choice("Enter product ID: ")
+
+    # Step 1: Show all available products
+    products = storefront.browse_products()
+    display_products(products, "Available Products to Add")
+    
+    if not products:
+        print("No products available to add.")
+        pause()
+        return
+
+    # Step 2: Ask user which product to add
+    product_id = get_user_choice("Enter product ID to add: ")
 
     if not product_id:
         print("Product ID cannot be empty.")
         pause()
         return
 
+    # Step 3: Ask quantity
     qty_str = get_user_choice("Enter quantity (default 1): ")
     qty = 1
 
@@ -245,11 +259,12 @@ def customer_add_to_cart(storefront: StoreFront) -> None:
             pause()
             return
 
+    # Step 4: Try to add to cart
     try:
         storefront.add_to_cart(product_id, qty)
-        print(f"Successfully added {qty} unit(s) of product {product_id} to cart.")
+        print(f"✅ Successfully added {qty} unit(s) of product ID {product_id} to cart.")
     except ValueError as e:
-        print(f"Error: {e}")
+        print(f"⚠️ Error: {e}")
 
     pause()
 
@@ -293,7 +308,7 @@ def customer_update_cart(storefront: StoreFront) -> None:
 
 
 def customer_remove_from_cart(storefront: StoreFront) -> None:
-    """Handle removing item from cart (Scenario 2, Step 7)."""
+    """Handle removing a specified quantity from cart (Scenario 2, Step 7)."""
     items, subtotal = storefront.view_cart()
     display_cart_items(items, subtotal)
 
@@ -301,16 +316,50 @@ def customer_remove_from_cart(storefront: StoreFront) -> None:
         pause()
         return
 
-    product_id = get_user_choice("\nEnter product ID to remove: ")
+    product_id = get_user_choice("\nEnter product ID to remove from cart: ")
 
     if not product_id:
         print("Product ID cannot be empty.")
         pause()
         return
 
+    # Find the product in cart
+    product_in_cart = next((item for item in items if item['product_id'] == product_id), None)
+
+    if not product_in_cart:
+        print("Product not found in cart.")
+        pause()
+        return
+
+    current_qty = product_in_cart['qty']
+    qty_str = get_user_choice(f"Enter quantity to remove (1-{current_qty}, default {current_qty}): ")
+
+    if not qty_str:
+        qty_to_remove = current_qty  # default to removing all
+    else:
+        try:
+            qty_to_remove = int(qty_str)
+            if qty_to_remove <= 0:
+                print("Quantity must be positive.")
+                pause()
+                return
+            if qty_to_remove > current_qty:
+                print(f"You cannot remove more than {current_qty} units.")
+                pause()
+                return
+        except ValueError:
+            print("Invalid quantity. Please enter a valid number.")
+            pause()
+            return
+
     try:
-        storefront.remove_from_cart(product_id)
-        print(f"Successfully removed product {product_id} from cart.")
+        new_qty = current_qty - qty_to_remove
+        if new_qty <= 0:
+            storefront.remove_from_cart(product_id)
+            print(f"Removed all units of product {product_id} from cart.")
+        else:
+            storefront.update_cart_quantity(product_id, new_qty)
+            print(f"Removed {qty_to_remove} unit(s) of product {product_id}. New quantity: {new_qty}")
     except ValueError as e:
         print(f"Error: {e}")
 

@@ -1,8 +1,8 @@
-from .product import Product
-from typing import List, Optional, Dict, Any
 import json
+from typing import List, Optional, Dict, Any
 from pathlib import Path
 from decimal import Decimal
+from .product import Product
 
 
 class Catalogue:
