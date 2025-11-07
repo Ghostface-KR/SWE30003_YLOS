@@ -1,3 +1,15 @@
+import os
+from decimal import Decimal, InvalidOperation
+from typing import Optional, Tuple
+from .catalogue.catalogue import Catalogue
+from .catalogue.product import Product
+from .checkout.cart import Cart
+from .checkout.checkout_service import CheckoutService
+from .checkout.payment_service import PaymentService
+from .checkout.shipping_policy import ShippingPolicy
+from .storefront.storefront import StoreFront
+from .checkout.address import Address
+
 """
 main.py - Entry point for YLOS (Your Local Shop Online Store) System
 Provides command-line textual interface for all scenarios.
@@ -14,22 +26,6 @@ Scenarios demonstrated:
 3. Customer Checks Out (T4)
 4. Admin Updates Catalogue (T7)
 """
-
-from decimal import Decimal, InvalidOperation
-from typing import Optional, Tuple
-
-from .catalogue.catalogue import Catalogue
-from .catalogue.product import Product
-from .checkout.cart import Cart
-from .checkout.checkout_service import CheckoutService
-from .checkout.payment_service import PaymentService
-from .checkout.shipping_policy import ShippingPolicy
-from .storefront.storefront import StoreFront
-from .checkout.address import Address
-
-# Optional: for clearing console
-import os
-
 
 def clear_screen() -> None:
     """Clear the console screen for better UX."""
@@ -703,7 +699,8 @@ def main() -> None:
     """
     Main entry point for the application.
 
-    Initialises components, shows the banner, runs the main menu loop, and routes to customer/admin modes. Handles Ctrl+C and unexpected errors gracefully.
+    Initialises components, shows the banner, runs the main menu loop, and routes to customer/admin modes. 
+    Handles Ctrl+C and unexpected errors gracefully.
     """
     try:
         # Initialize core components

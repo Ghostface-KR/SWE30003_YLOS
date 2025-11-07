@@ -3,7 +3,6 @@ import uuid
 import datetime
 from decimal import Decimal
 from typing import Tuple, Optional, Any
-
 from ..orders.order_item import OrderItem
 from ..orders.order import Order
 from .cart import Cart

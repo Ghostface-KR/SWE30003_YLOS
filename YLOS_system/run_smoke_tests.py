@@ -1,8 +1,7 @@
 # run_smoke_tests.py
-from decimal import Decimal
 import os
+from decimal import Decimal
 from pathlib import Path
-
 from .catalogue.catalogue import Catalogue
 from .catalogue.product import Product
 from .checkout.cart import Cart
